@@ -7,6 +7,7 @@ import 'package:orbit_app/screens/mathfrenzy_4-6.dart';
 import 'package:orbit_app/screens/number_ninjas_4-6.dart';
 import 'package:orbit_app/screens/number_ninjas_6-8.dart';
 import 'package:orbit_app/screens/number_ninjas_8-10.dart';
+import 'package:orbit_app/screens/story_10-12.dart';
 import 'package:orbit_app/screens/story_6-8_1.dart';
 import 'package:orbit_app/screens/story_8-10.dart';
 import 'package:orbit_app/screens/word_wizard_4-6.dart';
@@ -479,7 +480,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ];
     } else if (selectedAgeGroup == "10-12") {
       games = [
-        {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleLevel1()},
+        {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleApp4()},
         {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas3(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp4()},
         {"title": "PHANTOM SPELLERS", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},

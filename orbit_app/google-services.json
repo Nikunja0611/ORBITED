@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "255716000813",
+    "project_id": "orbited-c1b5b",
+    "storage_bucket": "orbited-c1b5b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255716000813:android:d3da5107f88a6639caa4a4",
+        "android_client_info": {
+          "package_name": "com.company.orbited.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC09l-W_czwtJ4KCsbic7epPrtbiwG5Kjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
