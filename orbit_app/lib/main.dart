@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/game_screen.dart';
 import 'screens/story_puzzle_level1.dart';
@@ -44,16 +45,33 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Kids Learning App',
-      theme: ThemeData(primarySwatch: Colors.orange),
-
+      title: 'Orbited Learning App',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/dashboard') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => DashboardScreen(
+              isLoggedIn: args?['isLoggedIn'] ?? isLoggedIn,
+              updateLoginStatus: args?['updateLoginStatus'] ?? _updateLoginStatus,
+            ),
+          );
+        }
+        return null;
+      },
       routes: {
-        '/': (context) => DashboardScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
+        '/': (context) => SplashScreen(
+          isLoggedIn: isLoggedIn, 
+          updateLoginStatus: _updateLoginStatus
+        ),
         '/login': (context) => LoginScreen(updateLoginStatus: _updateLoginStatus),
         '/games': (context) => const GamesScreen(),
-        '/storyPuzzle1': (context) =>  StoryPuzzleLevel1(),
-        '/storyPuzzle2': (context) =>  StoryPuzzleLevel2(),
+        '/storyPuzzle1': (context) => StoryPuzzleLevel1(),
+        '/storyPuzzle2': (context) => StoryPuzzleLevel2(),
       },
     );
   }

@@ -39,6 +39,18 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   lottie: ^2.6.0
+  camera: ^0.10.5
+  google_mlkit_image_labeling: ^0.11.0
+  permission_handler: ^11.0.1
+  animated_text_kit: ^4.2.2
+  flame: ^1.8.1
+  flame_audio: ^2.0.6
+  flame_tiled: ^1.7.3
+  rive: ^0.13.20
+  flare_flutter: ^3.0.2
+  reorderables: ^0.6.0
+  video_player: ^2.7.0 
+
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +85,13 @@ flutter:
      - assets/number_ninja_logo.jpeg
      - assets/bg_level2.png
      - assets/math_frenzy_logo.png
+     - assets/word_wizard_logo.png
+     - assets/astronaut.png
+     - assets/space_explorer.png
+     - assets/arbg1.png
+     - assets/background6.png
+     - assets/background7.png
+     - assets/ar_logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

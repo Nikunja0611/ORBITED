@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-class NumberNinjas extends StatefulWidget {
+class NumberNinjas3 extends StatefulWidget {
   final String ageGroup;
-  const NumberNinjas({Key? key, required this.ageGroup}) : super(key: key);
+  const NumberNinjas3({Key? key, required this.ageGroup}) : super(key: key);
 
   @override
   _NumberNinjasState createState() => _NumberNinjasState();
 }
 
-class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderStateMixin {
+class _NumberNinjasState extends State<NumberNinjas3>
+    with SingleTickerProviderStateMixin {
   int lives = 3;
   int score = 0;
   int correctStreak = 0;
   int num1 = 0;
   int num2 = 0;
-  String operator = '+';
+  String operator = '+'; // Now can be '+' or '-'
   int correctAnswer = 0;
   String feedbackEmoji = '';
   List<Widget> heartIcons = [];
@@ -37,18 +38,18 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
     for (int i = 0; i < lives; i++) {
       heartIcons.add(const Icon(Icons.favorite, color: Colors.red, size: 30));
     }
-    
+
     // Setup animations
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    
+
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.elasticOut,
     );
-    
+
     generateQuestion();
   }
 
@@ -63,48 +64,59 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
   void generateQuestion() {
     Random random = Random();
 
+    // Randomly choose between addition and subtraction
+    operator = random.nextBool() ? '+' : '-';
+
     if (widget.ageGroup == "4-6") {
-      num1 = random.nextInt(5) + 1; // Numbers between 1-5
-      num2 = random.nextInt(5) + 1;
-      operator = '+'; // Only addition
+      if (operator == '+') {
+        num1 = random.nextInt(5) + 1; // Numbers between 1-5
+        num2 = random.nextInt(5) + 1;
+      } else {
+        // For subtraction, ensure num1 >= num2 to avoid negative answers
+        num1 = random.nextInt(5) + 1; // Numbers between 1-5
+        num2 = random.nextInt(num1) + 1; // Ensure num2 <= num1
+      }
     } else if (widget.ageGroup == "6-8") {
-      num1 = random.nextInt(10) + 1; // Numbers between 1-10
-      num2 = random.nextInt(10) + 1;
-      List<String> operators = ['+', '-']; // Addition & Subtraction
-      operator = operators[random.nextInt(operators.length)];
-      
-      // Ensure no negative answers for young children
-      if (operator == '-' && num2 > num1) {
-        // Swap the numbers
-        int temp = num1;
-        num1 = num2;
-        num2 = temp;
+      if (operator == '+') {
+        num1 = random.nextInt(10) + 1; // Numbers between 1-10
+        num2 = random.nextInt(10) + 1;
+      } else {
+        num1 = random.nextInt(10) + 1; // Numbers between 1-10
+        num2 = random.nextInt(num1) + 1; // Ensure num2 <= num1
+      }
+    } else {
+      // Default case for any other age group
+      if (operator == '+') {
+        num1 = random.nextInt(15) + 1; // Numbers between 1-15
+        num2 = random.nextInt(15) + 1;
+      } else {
+        num1 = random.nextInt(15) + 1; // Numbers between 1-15
+        num2 = random.nextInt(num1) + 1; // Ensure num2 <= num1
       }
     }
 
-    switch (operator) {
-      case '+':
-        correctAnswer = num1 + num2;
-        break;
-      case '-':
-        correctAnswer = num1 - num2;
-        break;
+    // Calculate the correct answer based on the operator
+    if (operator == '+') {
+      correctAnswer = num1 + num2;
+    } else {
+      correctAnswer = num1 - num2;
     }
+
     setState(() {});
   }
 
   void checkAnswer() {
     if (answerController.text.isEmpty) return;
-    
+
     int userAnswer = int.tryParse(answerController.text) ?? 0;
     isAnswerCorrect = userAnswer == correctAnswer;
-    
+
     if (isAnswerCorrect) {
       setState(() {
         score += 10;
         correctStreak++;
         feedbackEmoji = '✅';
-        
+
         if (correctStreak == 3) {
           lives = lives < 5 ? lives + 1 : lives; // Cap at 5 lives max
           if (heartIcons.length < 5) {
@@ -119,26 +131,26 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
         lives--;
         correctStreak = 0;
         feedbackEmoji = '❌';
-        
+
         if (heartIcons.isNotEmpty) {
           heartIcons.removeLast();
         }
       });
       showHeartAnimation(false);
     }
-    
+
     // Animate the question
     _animationController.reset();
     _animationController.forward();
-    
+
     answerController.clear();
-    
+
     if (lives > 0) {
       generateQuestion();
     } else {
       showGameOverDialog();
     }
-    
+
     _focusNode.requestFocus();
   }
 
@@ -176,10 +188,10 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
         ),
       ),
     );
-    
+
     _animationController.reset();
     _animationController.forward();
-    
+
     Future.delayed(const Duration(milliseconds: 800), () {
       if (context.mounted) {
         Navigator.of(context).pop();
@@ -194,7 +206,8 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: Colors.deepPurple.shade900,
-        title: const Text("Game Over", 
+        title: const Text(
+          "Game Over",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -222,7 +235,8 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -241,10 +255,8 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
       score = 0;
       correctStreak = 0;
       feedbackEmoji = '';
-      heartIcons = List.generate(
-        lives, 
-        (index) => const Icon(Icons.favorite, color: Colors.red, size: 30)
-      );
+      heartIcons = List.generate(lives,
+          (index) => const Icon(Icons.favorite, color: Colors.red, size: 30));
       answerController.clear();
       generateQuestion();
     });
@@ -255,11 +267,11 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
     final mediaQuery = MediaQuery.of(context);
     final size = mediaQuery.size;
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
-    
+
     // Theme variables
     final Color primaryColor = Colors.deepPurple.shade800;
     final Color accentColor = Colors.amber;
-    
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -287,7 +299,7 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
           ),
         ),
         child: SafeArea(
-          child: isLandscape 
+          child: isLandscape
               ? _buildLandscapeLayout(size, primaryColor, accentColor)
               : _buildPortraitLayout(size, primaryColor, accentColor),
         ),
@@ -295,16 +307,19 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildPortraitLayout(Size size, Color primaryColor, Color accentColor) {
+  Widget _buildPortraitLayout(
+      Size size, Color primaryColor, Color accentColor) {
     // Responsive sizing
     final double cardSize = min(size.width * 0.22, 100.0);
     final double fontSize = min(size.width * 0.06, 32.0);
     final double buttonHeight = min(size.height * 0.07, 60.0);
-    
+
     return SingleChildScrollView(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          minHeight: size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top,
+          minHeight: size.height -
+              AppBar().preferredSize.height -
+              MediaQuery.of(context).padding.top,
         ),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: size.width * 0.05),
@@ -329,7 +344,8 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                     ),
                     // Score
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: primaryColor,
                         borderRadius: BorderRadius.circular(20),
@@ -353,17 +369,19 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                   ],
                 ),
               ),
-              
+
               SizedBox(height: size.height * 0.05),
-              
+
               // Question container
               AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
                   return Transform.scale(
-                    scale: isAnswerCorrect 
-                        ? 1.0 + (_animation.value * 0.1) 
-                        : 1.0 - (_animation.value * 0.05) + (_animation.value * _animation.value * 0.05),
+                    scale: isAnswerCorrect
+                        ? 1.0 + (_animation.value * 0.1)
+                        : 1.0 -
+                            (_animation.value * 0.05) +
+                            (_animation.value * _animation.value * 0.05),
                     child: child,
                   );
                 },
@@ -384,26 +402,30 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildNumberCard(num1.toString(), Colors.blue.shade700, cardSize),
+                      _buildNumberCard(
+                          num1.toString(), Colors.blue.shade700, cardSize),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
-                          operator,
+                          operator, // Now shows either + or -
                           style: TextStyle(
                             fontSize: min(fontSize * 1.5, 48.0),
                             fontWeight: FontWeight.bold,
-                            color: Colors.green.shade400,
+                            color: operator == '+'
+                                ? Colors.green.shade400
+                                : Colors.red.shade400,
                           ),
                         ),
                       ),
-                      _buildNumberCard(num2.toString(), Colors.purple.shade700, cardSize),
+                      _buildNumberCard(
+                          num2.toString(), Colors.purple.shade700, cardSize),
                     ],
                   ),
                 ),
               ),
-              
+
               SizedBox(height: size.height * 0.05),
-              
+
               // Feedback emoji
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
@@ -413,9 +435,9 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                   style: TextStyle(fontSize: min(fontSize * 2, 64.0)),
                 ),
               ),
-              
+
               SizedBox(height: size.height * 0.05),
-              
+
               // Answer input
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
@@ -451,7 +473,7 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                   ),
                 ),
               ),
-              
+
               // Submit button
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -484,16 +506,18 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildLandscapeLayout(Size size, Color primaryColor, Color accentColor) {
+  Widget _buildLandscapeLayout(
+      Size size, Color primaryColor, Color accentColor) {
     // Responsive sizing for landscape - adjustable based on screen size
     final double cardSize = min(size.height * 0.18, 80.0);
-    final double fontSize = min(min(size.height * 0.05, size.width * 0.028), 24.0);
-    
+    final double fontSize =
+        min(min(size.height * 0.05, size.width * 0.028), 24.0);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // Adjust layout based on available width
         final bool isWideScreen = constraints.maxWidth > 900;
-        
+
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -527,7 +551,7 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                       children: heartIcons,
                     ),
                     SizedBox(height: constraints.maxHeight * 0.04),
-                    
+
                     // Score
                     Container(
                       width: double.infinity,
@@ -566,9 +590,9 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: constraints.maxHeight * 0.04),
-                    
+
                     // Feedback emoji
                     Expanded(
                       child: Center(
@@ -582,7 +606,7 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                         ),
                       ),
                     ),
-                    
+
                     // Add restart button at the bottom on the stats panel
                     SizedBox(
                       width: double.infinity,
@@ -600,7 +624,7 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                 ),
               ),
             ),
-            
+
             // Middle - Question
             Expanded(
               flex: isWideScreen ? 4 : 3,
@@ -609,9 +633,11 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                   animation: _animation,
                   builder: (context, child) {
                     return Transform.scale(
-                      scale: isAnswerCorrect 
-                          ? 1.0 + (_animation.value * 0.1) 
-                          : 1.0 - (_animation.value * 0.05) + (_animation.value * _animation.value * 0.05),
+                      scale: isAnswerCorrect
+                          ? 1.0 + (_animation.value * 0.1)
+                          : 1.0 -
+                              (_animation.value * 0.05) +
+                              (_animation.value * _animation.value * 0.05),
                       child: child,
                     );
                   },
@@ -632,26 +658,31 @@ class _NumberNinjasState extends State<NumberNinjas> with SingleTickerProviderSt
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildNumberCard(num1.toString(), Colors.blue.shade700, cardSize),
+                        _buildNumberCard(
+                            num1.toString(), Colors.blue.shade700, cardSize),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.01),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: constraints.maxWidth * 0.01),
                           child: Text(
-                            operator,
+                            operator, // Now shows either + or -
                             style: TextStyle(
                               fontSize: fontSize * 1.5,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green.shade400,
+                              color: operator == '+'
+                                  ? Colors.green.shade400
+                                  : Colors.red.shade400,
                             ),
                           ),
                         ),
-                        _buildNumberCard(num2.toString(), Colors.purple.shade700, cardSize),
+                        _buildNumberCard(
+                            num2.toString(), Colors.purple.shade700, cardSize),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-            
+
             // Right - Answer input
             Expanded(
               flex: isWideScreen ? 4 : 3,

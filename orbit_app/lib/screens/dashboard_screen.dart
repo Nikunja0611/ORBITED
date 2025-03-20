@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:orbit_app/screens/ar.dart';
 import 'package:orbit_app/screens/mathfrenzy_10-12.dart';
 import 'package:orbit_app/screens/mathfrenzy_6-8.dart';
 import 'package:orbit_app/screens/mathfrenzy_8-10.dart';
 import 'package:orbit_app/screens/mathfrenzy_4-6.dart';
+import 'package:orbit_app/screens/number_ninjas_4-6.dart';
+import 'package:orbit_app/screens/number_ninjas_6-8.dart';
+import 'package:orbit_app/screens/number_ninjas_8-10.dart';
+import 'package:orbit_app/screens/story_6-8_1.dart';
+import 'package:orbit_app/screens/story_8-10.dart';
+import 'package:orbit_app/screens/word_wizard_4-6.dart';
+import 'package:orbit_app/screens/word_wizard_6-8.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:orbit_app/screens/number_ninjas.dart';
+import 'package:orbit_app/screens/number_ninjas_4-6.dart';
+import 'package:orbit_app/screens/number_ninjas_6-8.dart';
+import 'package:orbit_app/screens/number_ninjas_8-10.dart';
 import 'package:orbit_app/screens/story_puzzle_level1.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -447,26 +457,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (selectedAgeGroup == "4-6") {
       games = [
         {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleLevel1()},
-        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas(ageGroup: selectedAgeGroup!)},
-        {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp1()},
+        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas1(ageGroup: selectedAgeGroup!)},
+        {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp1()},       
+        {"title": "WORD WIZARD", "image": "assets/word_wizard_logo.png", "screen": WordWizardApp1()},
+        {"title": "Phantom Spellers", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     } else if (selectedAgeGroup == "6-8") {
       games = [
-        {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleLevel1()},
-        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas(ageGroup: selectedAgeGroup!)},
+        {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzelApp2_1()},
+        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas2(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp2()},
+        {"title": "WORD WIZARD", "image": "assets/word_wizard_logo.png", "screen": WordWizardApp2()},
+        {"title": "Phantom Spellers", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     } else if (selectedAgeGroup == "8-10") {
       games = [
-        {"title": "MATH MASTERS", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleLevel1()},
-        {"title": "SCIENCE QUEST", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas(ageGroup: selectedAgeGroup!)},
+        {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleApp3()},
+        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas3(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp3()},
+        {"title": "PHANTOM SPELLERS", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     } else if (selectedAgeGroup == "10-12") {
       games = [
         {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleLevel1()},
-        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas(ageGroup: selectedAgeGroup!)},
+        {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas3(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp4()},
+        {"title": "PHANTOM SPELLERS", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     }
 
