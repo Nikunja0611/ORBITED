@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/dashboard_screen.dart';
-import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/game_screen.dart';
 import 'screens/story_puzzle_level1.dart';
 import 'screens/story_puzzle_level2.dart';
+import 'screens/splash_screen.dart'; // Import the splash screen
 
 void main() {
   runApp(const MyApp());
@@ -45,29 +45,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Orbited Learning App',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/',
-      onGenerateRoute: (settings) {
-        if (settings.name == '/dashboard') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => DashboardScreen(
-              isLoggedIn: args?['isLoggedIn'] ?? isLoggedIn,
-              updateLoginStatus: args?['updateLoginStatus'] ?? _updateLoginStatus,
-            ),
-          );
-        }
-        return null;
-      },
+      title: 'Kids Learning App',
+      theme: ThemeData(primarySwatch: Colors.orange),
+      
+      // Changed initialRoute to use splash screen
+      initialRoute: '/splash',
       routes: {
-        '/': (context) => SplashScreen(
-          isLoggedIn: isLoggedIn, 
-          updateLoginStatus: _updateLoginStatus
-        ),
+        '/splash': (context) => SplashScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
+        '/': (context) => DashboardScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
+        '/dashboard': (context) => DashboardScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
         '/login': (context) => LoginScreen(updateLoginStatus: _updateLoginStatus),
         '/games': (context) => const GamesScreen(),
         '/storyPuzzle1': (context) => StoryPuzzleLevel1(),

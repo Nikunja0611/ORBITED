@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
                   ),
                   const SizedBox(height: 20),
-                  Text(
+                  const Text(
                     "ORBITED",
                     style: TextStyle(
                       fontSize: 24,
