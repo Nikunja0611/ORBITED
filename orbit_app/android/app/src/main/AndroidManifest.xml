@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.camera.ar" android:required="true"/>
     <application
-        android:label="orbit_app"
+        android:label="orbitapp"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

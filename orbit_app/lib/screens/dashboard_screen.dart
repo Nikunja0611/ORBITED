@@ -12,12 +12,11 @@ import 'package:orbit_app/screens/story_6-8_1.dart';
 import 'package:orbit_app/screens/story_8-10.dart';
 import 'package:orbit_app/screens/word_wizard_4-6.dart';
 import 'package:orbit_app/screens/word_wizard_6-8.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:orbit_app/screens/number_ninjas_4-6.dart';
-import 'package:orbit_app/screens/number_ninjas_6-8.dart';
-import 'package:orbit_app/screens/number_ninjas_8-10.dart';
 import 'package:orbit_app/screens/story_puzzle_level1.dart';
+import 'package:orbit_app/screens/miss_mary.dart'; // Import for AI Tutor
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:orbit_app/screens/progress.dart';
 
 class DashboardScreen extends StatefulWidget {
   final bool isLoggedIn;
@@ -31,6 +30,75 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   String? selectedAgeGroup;
+  int _currentIndex = 0; // Track current navigation index
+
+  void _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      widget.updateLoginStatus(false);
+      setState(() {
+        selectedAgeGroup = null;
+      });
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Logout failed: ${e.toString()}"))
+      );
+    }
+  }
+
+  // Handle navigation between sections
+  void _navigateTo(int index) {
+    if (index == 0) { // Dashboard
+      setState(() {
+        _currentIndex = 0;
+      });
+    } else if (index == 1) { // Progress
+      setState(() {
+        _currentIndex = 1;
+      });
+      // Navigate to progress page when implemented
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Progress tracking coming soon!"))
+      );
+    } else if (index == 2) { // AI Tutor
+      setState(() {
+        _currentIndex = 2;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MissMary()),
+      );
+    } else if (index == 3) { // Account
+      if (widget.isLoggedIn) {
+        // Show logout dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Account"),
+            content: const Text("Do you want to log out?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _logout();
+                },
+                child: const Text("Logout"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        Navigator.pushNamed(context, '/login');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +111,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     
     return Scaffold(
       appBar: _buildAppBar(isSmallScreen, isTinyScreen),
-      drawer: isSmallScreen ? _buildDrawer() : null,
+      // Always show drawer regardless of screen size
+      drawer: _buildDrawer(),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -82,7 +151,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: isSmallScreen && isLandscape ? _buildBottomNav() : null,
+      // Remove bottom navigation bar
+      bottomNavigationBar: null,
     );
   }
 
@@ -112,21 +182,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      leading: isSmallScreen ? null : const SizedBox(),
-      actions: isSmallScreen
-          ? [_buildAuthTab(isSmallScreen)]
-          : [
-              _buildNavTab("Dashboard", Icons.dashboard, isActive: true, isSmallScreen: isSmallScreen),
-              _buildNavTab("Progress", Icons.bar_chart, isSmallScreen: isSmallScreen),
-              _buildNavTab("AI Tutor", Icons.psychology, isSmallScreen: isSmallScreen),
-              _buildAuthTab(isSmallScreen),
-            ],
+      // Remove conditional for actions - always show hamburger menu
+      actions: [_buildAuthTab(isSmallScreen)],
     );
   }
 
-  /// Drawer for small screens
+  /// Drawer for all screen sizes
   Widget _buildDrawer() {
-    // Drawer implementation unchanged
     return Drawer(
       child: Container(
         decoration: BoxDecoration(
@@ -166,21 +228,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
               ),
-              _buildDrawerItem("Dashboard", Icons.dashboard, isActive: true),
-              _buildDrawerItem("Progress", Icons.bar_chart),
-              _buildDrawerItem("AI Tutor", Icons.psychology),
+              _buildDrawerItem("Dashboard", Icons.dashboard, isActive: _currentIndex == 0, onTap: () {
+                Navigator.pop(context);
+                _navigateTo(0);
+              }),
+              _buildDrawerItem("Progress", Icons.bar_chart, isActive: _currentIndex == 1, onTap: () {
+                Navigator.pop(context);
+                _navigateTo(1);
+              }),
+              _buildDrawerItem("AI Tutor", Icons.psychology, isActive: _currentIndex == 2, onTap: () {
+                Navigator.pop(context);
+                _navigateTo(2);
+              }),
               const Divider(color: Colors.white30),
               _buildDrawerItem(
                 widget.isLoggedIn ? "Logout" : "Login", 
                 widget.isLoggedIn ? Icons.logout : Icons.login,
-                onTap: () async {
+                onTap: () {
+                  Navigator.pop(context);
                   if (widget.isLoggedIn) {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setBool("isLoggedIn", false);
-                    widget.updateLoginStatus(false);
-                    setState(() {
-                      selectedAgeGroup = null;
-                    });
+                    _logout();
                   } else {
                     Navigator.pushNamed(context, '/login');
                   }
@@ -208,54 +275,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
           fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
         ),
       ),
-      onTap: onTap ?? () {
-        Navigator.pop(context);
-      },
+      onTap: onTap,
       selectedTileColor: Colors.white.withOpacity(0.1),
       selected: isActive,
     );
   }
 
-  /// Bottom navigation 
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      backgroundColor: Colors.deepPurple.withOpacity(0.85),
-      selectedItemColor: Colors.amber,
-      unselectedItemColor: Colors.white,
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
-          label: "Dashboard",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
-          label: "Progress",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.psychology),
-          label: "AI Tutor",
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_circle),
-          label: "Account",
-        ),
-      ],
-      currentIndex: 0,
-      onTap: (index) {
-        // Navigation logic would go here
-      },
-    );
-  }
-
   /// Helper method to build navigation tabs
-  Widget _buildNavTab(String label, IconData icon, {bool isActive = false, required bool isSmallScreen}) {
+  Widget _buildNavTab(String label, IconData icon, {bool isActive = false, required bool isSmallScreen, VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: TextButton.icon(
-        onPressed: () {
-          // Navigation logic here
-        },
+        onPressed: onTap,
         icon: Icon(
           icon,
           color: isActive ? Colors.amber : Colors.white,
@@ -278,14 +309,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 12, left: 2),
       child: TextButton.icon(
-        onPressed: () async {
+        onPressed: () {
           if (widget.isLoggedIn) {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setBool("isLoggedIn", false);
-            widget.updateLoginStatus(false);
-            setState(() {
-              selectedAgeGroup = null;
-            });
+            _logout();
           } else {
             Navigator.pushNamed(context, '/login');
           }
@@ -476,6 +502,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleApp3()},
         {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas3(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp3()},
+        {"title": "WORD WIZARD", "image": "assets/word_wizard_logo.png", "screen": WordWizardApp2()},
         {"title": "PHANTOM SPELLERS", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     } else if (selectedAgeGroup == "10-12") {
@@ -483,6 +510,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleApp4()},
         {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas3(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp4()},
+        {"title": "WORD WIZARD", "image": "assets/word_wizard_logo.png", "screen": WordWizardApp2()},
         {"title": "PHANTOM SPELLERS", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     }

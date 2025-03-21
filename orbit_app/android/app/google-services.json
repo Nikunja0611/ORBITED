@@ -1,21 +1,40 @@
 {
   "project_info": {
-    "project_number": "255716000813",
-    "project_id": "orbited-c1b5b",
-    "storage_bucket": "orbited-c1b5b.firebasestorage.app"
+    "project_number": "177992848215",
+    "project_id": "orbit-app-85564",
+    "storage_bucket": "orbit-app-85564.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:255716000813:android:d3da5107f88a6639caa4a4",
+        "mobilesdk_app_id": "1:177992848215:android:1b0cf16029cf097faee412",
         "android_client_info": {
-          "package_name": "com.company.orbited.com"
+          "package_name": "com.company.ordbitapp"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC09l-W_czwtJ4KCsbic7epPrtbiwG5Kjc"
+          "current_key": "AIzaSyCuQ4AsN7NUdMdluhLfuHzYPlK7qCqcuTA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177992848215:android:e0c2b27846e7298daee412",
+        "android_client_info": {
+          "package_name": "com.example.orbitapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuQ4AsN7NUdMdluhLfuHzYPlK7qCqcuTA"
         }
       ],
       "services": {

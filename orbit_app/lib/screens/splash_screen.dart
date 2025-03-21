@@ -25,11 +25,32 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Initialize video player
     _controller = VideoPlayerController.asset('assets/Intro_video.mp4')
-      ..initialize().then((_) {
-        setState(() {
-          _isVideoInitialized = true;
-          _controller.play();
-        });
+    ..initialize().then((_) {
+    if (mounted) {
+      setState(() {
+        _isVideoInitialized = true;
+        _controller.play();
+      });
+
+      // Ensure the video is looping or handled properly
+      _controller.setLooping(false);
+      _controller.addListener(() {
+      if (_controller.value.position >= _controller.value.duration) {
+          _navigateToDashboard();
+        }
+      });
+
+      // Fallback timer in case video doesn't play
+      Timer(const Duration(seconds: 10), () {
+        if (mounted) {
+          _navigateToDashboard();
+        }
+      });
+    }
+  }).catchError((error) {
+    debugPrint("Error initializing video: $error");
+    _navigateToDashboard();
+
         
         // Navigate to dashboard after video ends
         _controller.addListener(() {

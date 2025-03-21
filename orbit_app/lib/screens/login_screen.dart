@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   final Function(bool) updateLoginStatus;
@@ -20,6 +21,11 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController regConfirmPasswordController = TextEditingController();
   
   bool isRegistering = false;
+  bool isLoading = false;
+  String errorMessage = '';
+  
+  // Firebase Auth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   
   @override
   Widget build(BuildContext context) {
@@ -86,7 +92,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                child: isRegistering ? _buildRegisterForm(isSmallScreen) : _buildLoginForm(isSmallScreen),
+                child: Column(
+                  children: [
+                    // Error message display
+                    if (errorMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            errorMessage,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      
+                    isRegistering 
+                      ? _buildRegisterForm(isSmallScreen) 
+                      : _buildLoginForm(isSmallScreen),
+                      
+                    // Loading indicator
+                    if (isLoading)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -112,11 +154,12 @@ class _LoginScreenState extends State<LoginScreen> {
         
         SizedBox(height: isSmallScreen ? 16 : 20),
 
-        // Player Name Field
+        // Email Field (changed from Player Name)
         _buildTextField(
           nameController, 
-          "Player Name",
-          prefixIcon: Icons.person,
+          "Email",
+          prefixIcon: Icons.email,
+          keyboardType: TextInputType.emailAddress,
           isSmallScreen: isSmallScreen
         ),
 
@@ -135,13 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () async {
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.setBool("isLoggedIn", true);
-              widget.updateLoginStatus(true);
-
-              Navigator.pop(context); // Go back to Dashboard
-            },
+            onPressed: isLoading ? null : _signInWithEmailAndPassword,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -165,11 +202,14 @@ class _LoginScreenState extends State<LoginScreen> {
         
         // Register Link
         TextButton(
-          onPressed: () {
-            setState(() {
-              isRegistering = true;
-            });
-          },
+          onPressed: isLoading 
+            ? null 
+            : () {
+              setState(() {
+                isRegistering = true;
+                errorMessage = '';
+              });
+            },
           child: const Text(
             "Not a player already? Register here",
             style: TextStyle(
@@ -240,36 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              // Simple validation
-              if (regPasswordController.text != regConfirmPasswordController.text) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Passwords don't match!"))
-                );
-                return;
-              }
-              
-              if (regNameController.text.isEmpty || 
-                  regEmailController.text.isEmpty || 
-                  regPasswordController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please fill all fields!"))
-                );
-                return;
-              }
-              
-              // Registration successful
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Registration successful! Please login."))
-              );
-              
-              // Reset form and switch to login
-              setState(() {
-                isRegistering = false;
-                nameController.text = regNameController.text;
-                passwordController.text = "";
-              });
-            },
+            onPressed: isLoading ? null : _registerWithEmailAndPassword,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -293,11 +304,14 @@ class _LoginScreenState extends State<LoginScreen> {
         
         // Login Link
         TextButton(
-          onPressed: () {
-            setState(() {
-              isRegistering = false;
-            });
-          },
+          onPressed: isLoading 
+            ? null 
+            : () {
+              setState(() {
+                isRegistering = false;
+                errorMessage = '';
+              });
+            },
           child: const Text(
             "Already registered? Login here",
             style: TextStyle(
@@ -347,5 +361,122 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+  
+  // Firebase Authentication methods
+  
+  /// Sign in with email and password
+  Future<void> _signInWithEmailAndPassword() async {
+    // Validate input
+    if (nameController.text.isEmpty || passwordController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please enter both email and password';
+      });
+      return;
+    }
+    
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+    
+    try {
+      // Attempt to sign in
+      final UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: nameController.text.trim(),
+        password: passwordController.text,
+      );
+      
+      // Update login status in SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool("isLoggedIn", true);
+      widget.updateLoginStatus(true);
+      
+      // Navigate back (or to dashboard)
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'user-not-found') {
+          errorMessage = 'No user found with this email';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Wrong password provided';
+        } else {
+          errorMessage = 'Login failed: ${e.message}';
+        }
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Login failed: $e';
+        isLoading = false;
+      });
+    }
+  }
+  
+  /// Register with email and password
+  Future<void> _registerWithEmailAndPassword() async {
+    // Input validation
+    if (regNameController.text.isEmpty || 
+        regEmailController.text.isEmpty || 
+        regPasswordController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please fill all fields';
+      });
+      return;
+    }
+    
+    if (regPasswordController.text != regConfirmPasswordController.text) {
+      setState(() {
+        errorMessage = 'Passwords don\'t match';
+      });
+      return;
+    }
+    
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+    
+    try {
+      // Create user with email and password
+      final UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: regEmailController.text.trim(),
+        password: regPasswordController.text,
+      );
+      
+      // Update user profile with display name
+      await userCredential.user?.updateDisplayName(regNameController.text);
+      
+      // Registration successful notification
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registration successful! Please login."))
+      );
+      
+      // Reset form and switch to login
+      setState(() {
+        isRegistering = false;
+        isLoading = false;
+        nameController.text = regEmailController.text;
+        passwordController.text = "";
+      });
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'weak-password') {
+          errorMessage = 'The password is too weak';
+        } else if (e.code == 'email-already-in-use') {
+          errorMessage = 'An account already exists for this email';
+        } else {
+          errorMessage = 'Registration failed: ${e.message}';
+        }
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Registration failed: $e';
+        isLoading = false;
+      });
+    }
   }
 }

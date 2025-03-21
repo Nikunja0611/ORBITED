@@ -1,14 +1,23 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/login_screen.dart';
-import 'screens/game_screen.dart';
-import 'screens/story_puzzle_level1.dart';
-import 'screens/story_puzzle_level2.dart';
-import 'screens/splash_screen.dart'; // Import the splash screen
+import 'screens/splash_screen.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyCuQ4AsN7NUdMdluhLfuHzYPlK7qCqcuTA",
+      appId: "1:177992848215:android:1b0cf16029cf097faee412",
+      messagingSenderId: "177992848215",
+      projectId: "orbit-app-85564",
+      // Add other platform-specific values as needed
+    ),
+  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -47,17 +56,13 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Kids Learning App',
       theme: ThemeData(primarySwatch: Colors.orange),
-      
-      // Changed initialRoute to use splash screen
       initialRoute: '/splash',
       routes: {
-        '/splash': (context) => SplashScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
-        '/': (context) => DashboardScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
-        '/dashboard': (context) => DashboardScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
+        '/splash': (context) =>
+            SplashScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
+        '/dashboard': (context) =>
+            DashboardScreen(isLoggedIn: isLoggedIn, updateLoginStatus: _updateLoginStatus),
         '/login': (context) => LoginScreen(updateLoginStatus: _updateLoginStatus),
-        '/games': (context) => const GamesScreen(),
-        '/storyPuzzle1': (context) => StoryPuzzleLevel1(),
-        '/storyPuzzle2': (context) => StoryPuzzleLevel2(),
       },
     );
   }

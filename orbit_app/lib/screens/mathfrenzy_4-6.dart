@@ -725,7 +725,7 @@ class _MathFrenzyState extends State<MathFrenzy> {
               ],
             ),
           ),
-
+          
           // Celebration animation
         ],
       ),

@@ -53,6 +53,15 @@ dependencies:
   firebase_core: ^3.12.1
   firebase_auth: ^5.5.1
   cloud_firestore: ^5.6.5
+  google_sign_in: ^5.4.2
+  speech_to_text: ^6.1.1
+  text_to_speech: ^0.2.3
+ # Ensure this is the latest version
+  flutter_svg: ^2.0.9
+  flutter_lints: ^2.0.0
+  fl_chart: ^0.62.0       # For charts and graphs
+  percent_indicator: ^4.2.3   # For circular and linear progress indicators
+  intl: ^0.18.1           # For date formatting
 
 
 dev_dependencies:
@@ -64,7 +73,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -95,6 +104,7 @@ flutter:
      - assets/background6.png
      - assets/background7.png
      - assets/ar_logo.png
+     - assets/miss_mary_talking.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
