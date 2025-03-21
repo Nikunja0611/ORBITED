@@ -16,7 +16,6 @@ import 'package:orbit_app/screens/story_puzzle_level1.dart';
 import 'package:orbit_app/screens/miss_mary.dart'; // Import for AI Tutor
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:orbit_app/screens/progress.dart';
 
 class DashboardScreen extends StatefulWidget {
   final bool isLoggedIn;
