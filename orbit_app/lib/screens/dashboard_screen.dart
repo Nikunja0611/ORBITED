@@ -10,6 +10,7 @@ import 'package:orbit_app/screens/number_ninjas_8-10.dart';
 import 'package:orbit_app/screens/story_10-12.dart';
 import 'package:orbit_app/screens/story_6-8_1.dart';
 import 'package:orbit_app/screens/story_8-10.dart';
+import 'package:orbit_app/screens/word_wizard_10-12.dart';
 import 'package:orbit_app/screens/word_wizard_4-6.dart';
 import 'package:orbit_app/screens/word_wizard_6-8.dart';
 import 'package:orbit_app/screens/story_puzzle_level1.dart';
@@ -509,7 +510,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         {"title": "STORY PUZZLE", "image": "assets/story_puzzle_logo.jpeg", "screen": StoryPuzzleApp4()},
         {"title": "NUMBER NINJA", "image": "assets/number_ninja_logo.jpeg", "screen": NumberNinjas3(ageGroup: selectedAgeGroup!)},
         {"title": "MATH FRENZY", "image": "assets/math_frenzy_logo.png", "screen": MathFrenzyApp4()},
-        {"title": "WORD WIZARD", "image": "assets/word_wizard_logo.png", "screen": WordWizardApp2()},
+        {"title": "WORD WIZARD", "image": "assets/word_wizard_logo.png", "screen": WordWizardApp4()},
         {"title": "PHANTOM SPELLERS", "image": "assets/ar_logo.png", "screen": ARWordHuntGame()},
       ];
     }
