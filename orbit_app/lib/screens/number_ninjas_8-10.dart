@@ -16,7 +16,7 @@ class _NumberNinjasState extends State<NumberNinjas3>
   int correctStreak = 0;
   int num1 = 0;
   int num2 = 0;
-  String operator = '+'; // Now can be '+' or '-'
+  String operator = '+'; // Now can be '+', '-', '×', or '÷'
   int correctAnswer = 0;
   String feedbackEmoji = '';
   List<Widget> heartIcons = [];
@@ -64,42 +64,86 @@ class _NumberNinjasState extends State<NumberNinjas3>
   void generateQuestion() {
     Random random = Random();
 
-    // Randomly choose between addition and subtraction
-    operator = random.nextBool() ? '+' : '-';
+    // Randomly choose between addition, subtraction, multiplication, and division
+    int operationIndex = random.nextInt(4);
+    switch (operationIndex) {
+      case 0:
+        operator = '+';
+        break;
+      case 1:
+        operator = '-';
+        break;
+      case 2:
+        operator = '×';
+        break;
+      case 3:
+        operator = '÷';
+        break;
+    }
 
     if (widget.ageGroup == "4-6") {
       if (operator == '+') {
         num1 = random.nextInt(5) + 1; // Numbers between 1-5
         num2 = random.nextInt(5) + 1;
-      } else {
+      } else if (operator == '-') {
         // For subtraction, ensure num1 >= num2 to avoid negative answers
         num1 = random.nextInt(5) + 1; // Numbers between 1-5
         num2 = random.nextInt(num1) + 1; // Ensure num2 <= num1
+      } else if (operator == '×') {
+        // Simple multiplication for young kids
+        num1 = random.nextInt(3) + 1; // Numbers between 1-3
+        num2 = random.nextInt(3) + 1; // Numbers between 1-3
+      } else if (operator == '÷') {
+        // Simple division with no remainder
+        num2 = random.nextInt(3) + 1; // Divisor between 1-3
+        correctAnswer = random.nextInt(2) + 1; // Quotient between 1-2
+        num1 = num2 * correctAnswer; // Calculate dividend for clean division
       }
     } else if (widget.ageGroup == "6-8") {
       if (operator == '+') {
         num1 = random.nextInt(10) + 1; // Numbers between 1-10
         num2 = random.nextInt(10) + 1;
-      } else {
+      } else if (operator == '-') {
         num1 = random.nextInt(10) + 1; // Numbers between 1-10
         num2 = random.nextInt(num1) + 1; // Ensure num2 <= num1
+      } else if (operator == '×') {
+        num1 = random.nextInt(5) + 1; // Numbers between 1-5
+        num2 = random.nextInt(5) + 1; // Numbers between 1-5
+      } else if (operator == '÷') {
+        // Division with no remainder
+        num2 = random.nextInt(5) + 1; // Divisor between 1-5
+        correctAnswer = random.nextInt(3) + 1; // Quotient between 1-3
+        num1 = num2 * correctAnswer; // Calculate dividend for clean division
       }
     } else {
-      // Default case for any other age group
+      // Default case for older age groups
       if (operator == '+') {
         num1 = random.nextInt(15) + 1; // Numbers between 1-15
         num2 = random.nextInt(15) + 1;
-      } else {
+      } else if (operator == '-') {
         num1 = random.nextInt(15) + 1; // Numbers between 1-15
         num2 = random.nextInt(num1) + 1; // Ensure num2 <= num1
+      } else if (operator == '×') {
+        num1 = random.nextInt(10) + 1; // Numbers between 1-10
+        num2 = random.nextInt(10) + 1; // Numbers between 1-10
+      } else if (operator == '÷') {
+        // Division with no remainder for more challenging problems
+        num2 = random.nextInt(10) + 1; // Divisor between 1-10
+        correctAnswer = random.nextInt(10) + 1; // Quotient between 1-10
+        num1 = num2 * correctAnswer; // Calculate dividend for clean division
       }
     }
 
     // Calculate the correct answer based on the operator
     if (operator == '+') {
       correctAnswer = num1 + num2;
-    } else {
+    } else if (operator == '-') {
       correctAnswer = num1 - num2;
+    } else if (operator == '×') {
+      correctAnswer = num1 * num2;
+    } else if (operator == '÷') {
+      // For division, num1 is already calculated to ensure clean division
+      // correctAnswer is already set during number generation
     }
 
     setState(() {});
@@ -113,7 +157,13 @@ class _NumberNinjasState extends State<NumberNinjas3>
 
     if (isAnswerCorrect) {
       setState(() {
-        score += 10;
+        // Award more points for multiplication and division
+        if (operator == '×' || operator == '÷') {
+          score += 15; // More points for harder operations
+        } else {
+          score += 10; // Standard points for addition/subtraction
+        }
+
         correctStreak++;
         feedbackEmoji = '✅';
 
@@ -262,6 +312,21 @@ class _NumberNinjasState extends State<NumberNinjas3>
     });
   }
 
+  Color getOperatorColor(String op) {
+    switch (op) {
+      case '+':
+        return Colors.green.shade400;
+      case '-':
+        return Colors.red.shade400;
+      case '×':
+        return Colors.orange.shade400;
+      case '÷':
+        return Colors.blue.shade400;
+      default:
+        return Colors.white;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -407,13 +472,11 @@ class _NumberNinjasState extends State<NumberNinjas3>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
-                          operator, // Now shows either + or -
+                          operator, // Now shows +, -, ×, or ÷
                           style: TextStyle(
                             fontSize: min(fontSize * 1.5, 48.0),
                             fontWeight: FontWeight.bold,
-                            color: operator == '+'
-                                ? Colors.green.shade400
-                                : Colors.red.shade400,
+                            color: getOperatorColor(operator),
                           ),
                         ),
                       ),
@@ -664,13 +727,11 @@ class _NumberNinjasState extends State<NumberNinjas3>
                           padding: EdgeInsets.symmetric(
                               horizontal: constraints.maxWidth * 0.01),
                           child: Text(
-                            operator, // Now shows either + or -
+                            operator, // Now shows +, -, ×, or ÷
                             style: TextStyle(
                               fontSize: fontSize * 1.5,
                               fontWeight: FontWeight.bold,
-                              color: operator == '+'
-                                  ? Colors.green.shade400
-                                  : Colors.red.shade400,
+                              color: getOperatorColor(operator),
                             ),
                           ),
                         ),
